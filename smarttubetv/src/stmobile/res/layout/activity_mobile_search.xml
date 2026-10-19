@@ -35,9 +35,10 @@
 
         <ImageButton
             android:id="@+id/mobile_search_back"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_mobile_search_toolbar_button"
             android:contentDescription="@string/mobile_back"
             android:padding="12dp"
             android:src="@drawable/ic_mobile_back_arrow" />
@@ -74,9 +75,10 @@
 
         <ImageButton
             android:id="@+id/mobile_search_mic"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_mobile_search_toolbar_button"
             android:contentDescription="@string/mobile_search_voice"
             android:padding="12dp"
             android:src="@drawable/ic_mobile_mic" />
