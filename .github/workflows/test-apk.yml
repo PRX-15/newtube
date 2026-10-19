@@ -1,0 +1,51 @@
+name: Build test APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/test-apk.yml"
+      - "smarttubetv/**"
+      - "gradle/**"
+      - "*.gradle"
+      - "gradlew"
+      - "gradle.properties"
+      - ".gitmodules"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out source and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build side-by-side debug APKs
+        run: ./gradlew --no-daemon --stacktrace :smarttubetv:assembleStmobileDebug
+
+      - name: Upload debug APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: NewTube-test-debug-${{ github.sha }}
+          path: smarttubetv/build/outputs/apk/stmobile/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
