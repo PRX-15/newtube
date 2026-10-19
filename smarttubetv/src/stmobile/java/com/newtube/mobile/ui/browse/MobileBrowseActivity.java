@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -155,6 +156,8 @@ public class MobileBrowseActivity extends MobileActivity
     private GridLayoutManager mLayoutManager;
     private VideoCardAdapter mAdapter;
     private BottomNavigationView mBottomNav;
+    private View mNavIndicator;
+    private boolean mBottomNavHidden;
     // "You" tab panel (account header + grouped section rows + Settings row; replaces the drawer).
     private View mYouPanel;
     private LinearLayout mYouRows;
@@ -301,7 +304,18 @@ public class MobileBrowseActivity extends MobileActivity
         mFeedSkeleton = findViewById(R.id.mobile_feed_skeleton);
         setupSwipeRefresh();
         mBottomNav = findViewById(R.id.mobile_bottom_nav);
+        mNavIndicator = findViewById(R.id.mobile_bottom_nav_indicator);
         mYouPanel = findViewById(R.id.mobile_you_panel);
+        if (mYouPanel instanceof ScrollView) {
+            ((ScrollView) mYouPanel).setOnScrollChangeListener((View v, int scrollX, int scrollY,
+                    int oldScrollX, int oldScrollY) -> {
+                if (scrollY > oldScrollY) {
+                    hideBottomNav();
+                } else if (scrollY < oldScrollY) {
+                    showBottomNav();
+                }
+            });
+        }
         mYouRows = findViewById(R.id.mobile_you_rows);
         mYouAccountText = findViewById(R.id.mobile_you_account_text);
         mYouAccountSub = findViewById(R.id.mobile_you_account_sub);
@@ -815,6 +829,11 @@ public class MobileBrowseActivity extends MobileActivity
         mContentGrid.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    hideBottomNav();
+                } else if (dy < 0) {
+                    showBottomNav();
+                }
                 if (dy < 0) {
                     // NEWTUBE(shelf-tail): scrolling back up re-arms the near-end report, so a
                     // reader at a stalled end (a failed or refused page, nothing new to scroll to)
@@ -935,9 +954,14 @@ public class MobileBrowseActivity extends MobileActivity
     }
 
     private void setupBottomNav() {
+        mBottomNav.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop,
+                oldRight, oldBottom) -> updateNavIndicator());
+        mBottomNav.post(this::updateNavIndicator);
         mBottomNav.setOnItemSelectedListener(item -> {
             if (!mSuppressNavCallback) {
+                showBottomNav();
                 onNavItemChosen(item.getItemId());
+                mBottomNav.post(this::updateNavIndicator);
             }
             return true;
         });
@@ -956,7 +980,72 @@ public class MobileBrowseActivity extends MobileActivity
         });
     }
 
+    /**
+     * The selected marker is an independent overlay because this app's bundled Material
+     * Components version does not expose the newer active-indicator XML attributes.
+     */
+    private void updateNavIndicator() {
+        if (mBottomNav == null || mNavIndicator == null
+                || mBottomNav.getVisibility() != View.VISIBLE) {
+            return;
+        }
+        int selectedId = mBottomNav.getSelectedItemId();
+        View selectedItem = mBottomNav.findViewById(selectedId);
+        if (selectedItem == null || selectedItem.getWidth() == 0 || mBottomNav.getWidth() == 0) {
+            mNavIndicator.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        View root = findViewById(R.id.mobile_browse_root);
+        int[] itemLocation = new int[2];
+        int[] rootLocation = new int[2];
+        int[] navLocation = new int[2];
+        selectedItem.getLocationOnScreen(itemLocation);
+        root.getLocationOnScreen(rootLocation);
+        mBottomNav.getLocationOnScreen(navLocation);
+
+        float density = getResources().getDisplayMetrics().density;
+        float indicatorWidth = 48f * density;
+        mNavIndicator.setX(itemLocation[0] - rootLocation[0]
+                + (selectedItem.getWidth() - indicatorWidth) / 2f);
+        mNavIndicator.setY(navLocation[1] - rootLocation[1] + 4f * density);
+        mNavIndicator.setVisibility(View.VISIBLE);
+        mNavIndicator.bringToFront();
+    }
+
+    /** Hide the floating dock only while the reader is moving down through a feed. */
+    private void hideBottomNav() {
+        if (mBottomNav == null || mBottomNavHidden || mYouShowing) {
+            return;
+        }
+        mBottomNavHidden = true;
+        float distance = mBottomNav.getHeight()
+                + mBottomNav.getLayoutParams().height
+                + 20f * getResources().getDisplayMetrics().density;
+        // Use the measured height, not the layout-param sentinel, for a stable off-screen target.
+        distance = mBottomNav.getHeight()
+                + 50f * getResources().getDisplayMetrics().density;
+        mBottomNav.animate().cancel();
+        mNavIndicator.animate().cancel();
+        mBottomNav.animate().translationY(distance).alpha(0f).setDuration(180L).start();
+        mNavIndicator.animate().translationY(distance).alpha(0f).setDuration(180L).start();
+    }
+
+    /** Restore the dock as soon as scrolling reverses, and after navigation changes. */
+    private void showBottomNav() {
+        if (mBottomNav == null) {
+            return;
+        }
+        mBottomNavHidden = false;
+        mBottomNav.animate().cancel();
+        mNavIndicator.animate().cancel();
+        mBottomNav.animate().translationY(0f).alpha(1f).setDuration(180L).start();
+        mNavIndicator.animate().translationY(0f).alpha(1f).setDuration(180L).start();
+        mBottomNav.post(this::updateNavIndicator);
+    }
+
     private void onNavItemChosen(int itemId) {
+        showBottomNav();
         if (itemId == YOU_ITEM_ID) {
             showYouPanel();
         } else {
@@ -1022,6 +1111,7 @@ public class MobileBrowseActivity extends MobileActivity
      * You sub-screen with a back arrow and its name.
      */
     private void onYouPanelToggled() {
+        showBottomNav();
         int a11y = mYouShowing
                 ? View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : View.IMPORTANT_FOR_ACCESSIBILITY_AUTO;
         mContentSwipe.setImportantForAccessibility(a11y);
