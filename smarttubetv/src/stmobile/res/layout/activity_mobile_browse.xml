@@ -75,9 +75,9 @@
     <ImageButton
         android:id="@+id/mobile_search_button"
         android:layout_width="48dp"
-        android:layout_height="@dimen/mobile_title_bar_height"
+        android:layout_height="44dp"
         android:layout_marginEnd="4dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@drawable/bg_mobile_search_button"
         android:contentDescription="@string/mobile_search_button"
         android:padding="12dp"
         android:src="@drawable/ic_mobile_search"
@@ -377,5 +377,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Small selected-tab marker positioned over the active menu item in code. -->
+    <View
+        android:id="@+id/mobile_bottom_nav_indicator"
+        android:layout_width="48dp"
+        android:layout_height="5dp"
+        android:background="@drawable/bg_mobile_nav_selected_indicator"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        android:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
