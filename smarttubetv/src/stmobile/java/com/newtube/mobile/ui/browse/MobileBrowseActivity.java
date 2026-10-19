@@ -998,17 +998,23 @@ public class MobileBrowseActivity extends MobileActivity
 
         View root = findViewById(R.id.mobile_browse_root);
         int[] itemLocation = new int[2];
-        int[] rootLocation = new int[2];
         int[] navLocation = new int[2];
         selectedItem.getLocationOnScreen(itemLocation);
-        root.getLocationOnScreen(rootLocation);
         mBottomNav.getLocationOnScreen(navLocation);
 
         float density = getResources().getDisplayMetrics().density;
         float indicatorWidth = 48f * density;
-        mNavIndicator.setX(itemLocation[0] - rootLocation[0]
+        // The indicator is a child of the root ConstraintLayout, so convert screen
+        // coordinates into root coordinates using the root's actual window offset.
+        int[] rootWindowLocation = new int[2];
+        root.getLocationInWindow(rootWindowLocation);
+        int[] itemWindowLocation = new int[2];
+        int[] navWindowLocation = new int[2];
+        selectedItem.getLocationInWindow(itemWindowLocation);
+        mBottomNav.getLocationInWindow(navWindowLocation);
+        mNavIndicator.setX(itemWindowLocation[0]
                 + (selectedItem.getWidth() - indicatorWidth) / 2f);
-        mNavIndicator.setY(navLocation[1] - rootLocation[1] + 4f * density);
+        mNavIndicator.setY(navWindowLocation[1] - rootWindowLocation[1] + 4f * density);
         mNavIndicator.setVisibility(View.VISIBLE);
         mNavIndicator.bringToFront();
     }
