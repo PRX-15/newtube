@@ -10,8 +10,8 @@
     <!-- Kept for non-thumbnail card surfaces such as playlist headers. -->
     <dimen name="mobile_card_corner_radius">12dp</dimen>
     <dimen name="mobile_thumbnail_corner_radius">14dp</dimen>
-    <dimen name="mobile_bottom_nav_height">56dp</dimen>
-    <dimen name="mobile_bottom_nav_horizontal_margin">16dp</dimen>
+    <dimen name="mobile_bottom_nav_height">64dp</dimen>
+    <dimen name="mobile_bottom_nav_horizontal_margin">12dp</dimen>
     <dimen name="mobile_bottom_nav_bottom_margin">10dp</dimen>
     <dimen name="mobile_bottom_nav_corner_radius">24dp</dimen>
     <dimen name="mobile_bottom_nav_elevation">4dp</dimen>
