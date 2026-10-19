@@ -75,9 +75,9 @@
     <ImageButton
         android:id="@+id/mobile_search_button"
         android:layout_width="48dp"
-        android:layout_height="44dp"
+        android:layout_height="@dimen/mobile_title_bar_height"
         android:layout_marginEnd="4dp"
-        android:background="@drawable/bg_mobile_search_button"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/mobile_search_button"
         android:padding="12dp"
         android:src="@drawable/ic_mobile_search"
