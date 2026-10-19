@@ -1012,7 +1012,7 @@ public class MobileBrowseActivity extends MobileActivity
         int[] navWindowLocation = new int[2];
         selectedItem.getLocationInWindow(itemWindowLocation);
         mBottomNav.getLocationInWindow(navWindowLocation);
-        mNavIndicator.setX(itemWindowLocation[0]
+        mNavIndicator.setX(itemWindowLocation[0] - rootWindowLocation[0]
                 + (selectedItem.getWidth() - indicatorWidth) / 2f);
         mNavIndicator.setY(navWindowLocation[1] - rootWindowLocation[1] + 4f * density);
         mNavIndicator.setVisibility(View.VISIBLE);
