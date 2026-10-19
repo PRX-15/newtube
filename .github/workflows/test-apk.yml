@@ -2,16 +2,6 @@ name: Build test APK
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/test-apk.yml"
-      - "smarttubetv/**"
-      - "gradle/**"
-      - "*.gradle"
-      - "gradlew"
-      - "gradle.properties"
-      - ".gitmodules"
 
 permissions:
   contents: read
@@ -39,13 +29,26 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build side-by-side debug APKs
-        run: ./gradlew --no-daemon --stacktrace :smarttubetv:assembleStmobileDebug
+      - name: Build arm64-v8a debug APK
+        run: ./gradlew --no-daemon --stacktrace :smarttubetv:assembleStmobileDebug -PrestrictedAbi=arm64-v8a
 
-      - name: Upload debug APKs
+      - name: Find arm64-v8a APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="$(find smarttubetv/build/outputs/apk/stmobile/debug -type f -name '*arm64-v8a*.apk' -print -quit)"
+          if [ -z "$apk" ]; then
+            echo "::error::Could not find an arm64-v8a APK. Available APKs:"
+            find smarttubetv/build/outputs/apk/stmobile/debug -type f -name '*.apk' -print
+            exit 1
+          fi
+          echo "path=$apk" >> "$GITHUB_OUTPUT"
+
+      - name: Upload arm64-v8a debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: NewTube-test-debug-${{ github.sha }}
-          path: smarttubetv/build/outputs/apk/stmobile/debug/*.apk
+          name: NewTube-test-debug-arm64-v8a-${{ github.sha }}
+          path: ${{ steps.apk.outputs.path }}
           if-no-files-found: error
           retention-days: 14
