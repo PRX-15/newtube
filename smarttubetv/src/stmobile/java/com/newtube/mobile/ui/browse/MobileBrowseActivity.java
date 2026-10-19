@@ -997,24 +997,30 @@ public class MobileBrowseActivity extends MobileActivity
         }
 
         View root = findViewById(R.id.mobile_browse_root);
-        int[] itemLocation = new int[2];
-        int[] navLocation = new int[2];
-        selectedItem.getLocationOnScreen(itemLocation);
-        mBottomNav.getLocationOnScreen(navLocation);
+        if (root == null) {
+            mNavIndicator.setVisibility(View.INVISIBLE);
+            return;
+        }
 
         float density = getResources().getDisplayMetrics().density;
         float indicatorWidth = 48f * density;
-        // The indicator is a child of the root ConstraintLayout, so convert screen
-        // coordinates into root coordinates using the root's actual window offset.
         int[] rootWindowLocation = new int[2];
-        root.getLocationInWindow(rootWindowLocation);
         int[] itemWindowLocation = new int[2];
         int[] navWindowLocation = new int[2];
+        root.getLocationInWindow(rootWindowLocation);
         selectedItem.getLocationInWindow(itemWindowLocation);
         mBottomNav.getLocationInWindow(navWindowLocation);
-        mNavIndicator.setX(itemWindowLocation[0] - rootWindowLocation[0]
-                + (selectedItem.getWidth() - indicatorWidth) / 2f);
-        mNavIndicator.setY(navWindowLocation[1] - rootWindowLocation[1] + 4f * density);
+
+        // Position the marker near the dock's lower edge, underneath the tab labels.
+        // Use window coordinates for both views, then convert into the root's coordinates.
+        float x = itemWindowLocation[0] - rootWindowLocation[0]
+                + (selectedItem.getWidth() - indicatorWidth) / 2f;
+        float y = navWindowLocation[1] - rootWindowLocation[1]
+                + mBottomNav.getHeight() - (9f * density)
+                - (mNavIndicator.getHeight() / 2f);
+
+        mNavIndicator.setX(x);
+        mNavIndicator.setY(y);
         mNavIndicator.setVisibility(View.VISIBLE);
         mNavIndicator.bringToFront();
     }
