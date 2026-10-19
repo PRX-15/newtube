@@ -220,20 +220,15 @@ android {
                 signingConfig signingConfigs.release
             }
         }
-        // Use same key for release and debug for testing
+        // Test APKs always keep their own stable package ID, whether CI has a persistent
+        // test keystore or a local machine falls back to Android's generated debug key.
+        // This avoids colliding with a separately installed release app and preserves the same
+        // applicationId across repeated GitHub Actions builds.
         debug {
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
-            } else {
-                // No keystore.properties on this machine, so debug falls back to the auto-generated
-                // debug key and can NOT replace an installed release build (INSTALL_FAILED_UPDATE_
-                // INCOMPATIBLE). Suffixing the applicationId lets the debug build sit side by side
-                // with the daily driver instead of forcing an uninstall that would wipe the signed-in
-                // OAuth state. All manifest authorities already interpolate ${applicationId}, so they
-                // follow the suffix automatically. When the release keystore IS present this branch
-                // is skipped and debug keeps replacing release in place, exactly as before.
-                applicationIdSuffix ".debug"
             }
+            applicationIdSuffix ".debug"
         }
         benchmark {
             initWith release
