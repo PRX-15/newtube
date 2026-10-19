@@ -7,7 +7,18 @@
          TV helper assumes landscape, which is wrong for a portrait phone). -->
     <dimen name="mobile_card_target_width">168dp</dimen>
     <dimen name="mobile_card_spacing">8dp</dimen>
+    <!-- Kept for non-thumbnail card surfaces such as playlist headers. -->
     <dimen name="mobile_card_corner_radius">12dp</dimen>
+    <dimen name="mobile_thumbnail_corner_radius">14dp</dimen>
+    <dimen name="mobile_bottom_nav_height">56dp</dimen>
+    <dimen name="mobile_bottom_nav_horizontal_margin">16dp</dimen>
+    <dimen name="mobile_bottom_nav_bottom_margin">10dp</dimen>
+    <dimen name="mobile_bottom_nav_corner_radius">24dp</dimen>
+    <dimen name="mobile_bottom_nav_elevation">4dp</dimen>
+    <dimen name="mobile_mini_player_gap">12dp</dimen>
+    <dimen name="mobile_mini_player_corner_radius">14dp</dimen>
+    <dimen name="mobile_mini_player_elevation">6dp</dimen>
+    <dimen name="mobile_mini_player_stroke">1dp</dimen>
     <!-- Standard phone toolbar height (actionBarSize). -->
     <dimen name="mobile_title_bar_height">56dp</dimen>
     <!-- MobileAppDialogActivity: a sheet on a wide (landscape) window stops at Material's 640dp

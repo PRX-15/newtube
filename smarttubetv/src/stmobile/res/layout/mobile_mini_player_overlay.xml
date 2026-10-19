@@ -15,8 +15,10 @@
     android:focusable="true"
     android:visibility="gone"
     app:cardBackgroundColor="@android:color/black"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="8dp"
+    app:cardCornerRadius="@dimen/mobile_mini_player_corner_radius"
+    app:cardElevation="@dimen/mobile_mini_player_elevation"
+    app:strokeColor="@color/mobile_color_divider"
+    app:strokeWidth="@dimen/mobile_mini_player_stroke"
     tools:visibility="visible">
 
     <FrameLayout

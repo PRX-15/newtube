@@ -5423,8 +5423,8 @@ public class MobilePlaybackActivity extends MobileActivity
      * a 12dp shadow and swap in one frame for the rounded card on landing (and start square over a
      * rounded thumbnail on open).
      */
-    private static final float MORPH_CORNER_DP = 12f;
-    private static final float MORPH_ELEVATION_DP = 8f;
+    private static final float MORPH_CORNER_DP = 14f;
+    private static final float MORPH_ELEVATION_DP = 6f;
     /** Corner radius of the video box in its OWN coordinates: the morph scales it with the box. */
     private float mMorphCornerLocalPx;
     @Nullable
@@ -5440,7 +5440,7 @@ public class MobilePlaybackActivity extends MobileActivity
     private void computeMorphTarget() {
         float density = getResources().getDisplayMetrics().density;
         float cardW = MINI_CARD_WIDTH_DP * density;
-        float margin = 12 * density;
+        float margin = getResources().getDimension(R.dimen.mobile_mini_player_gap);
         // Card bottom offset comes from the DESTINATION host: Browse's card floats above its
         // 56dp bottom-nav row, Search/Channel overlay cards sit flush at the content bottom.
         // Both containers already exclude the gesture inset in portrait, so no inset term here.

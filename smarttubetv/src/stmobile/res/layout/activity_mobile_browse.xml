@@ -269,13 +269,15 @@
         android:layout_width="180dp"
         android:layout_height="102dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="@dimen/mobile_mini_player_gap"
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone"
         app:cardBackgroundColor="@android:color/black"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="@dimen/mobile_mini_player_corner_radius"
+        app:cardElevation="@dimen/mobile_mini_player_elevation"
+        app:strokeColor="@color/mobile_color_divider"
+        app:strokeWidth="@dimen/mobile_mini_player_stroke"
         app:layout_constraintBottom_toTopOf="@id/mobile_bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible">
@@ -340,22 +342,24 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Matched against the real YouTube app on a Pixel 9 (2026-07): their icon/label row
-         measures ~51dp with 24dp icons and ~10sp labels, content centered, gesture inset
-         absorbed below. Stock M2 wrap_content (56dp row) is the closest the widget allows;
-         the view pads itself by the gesture-navigation inset (paddingBottomSystemWindowInsets)
-         so the bar paints through to the display edge without squeezing the row. -->
+    <!-- Floating dock. MobileActivity owns all system-bar safe insets on this screen, so this
+         component does not add a second gesture/navigation inset of its own. The 10dp bottom
+         margin is measured from the safe content edge; feed and panel surfaces stay above it. -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/mobile_bottom_nav"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/mobile_color_background"
+        android:layout_height="@dimen/mobile_bottom_nav_height"
+        android:layout_marginStart="@dimen/mobile_bottom_nav_horizontal_margin"
+        android:layout_marginEnd="@dimen/mobile_bottom_nav_horizontal_margin"
+        android:layout_marginBottom="@dimen/mobile_bottom_nav_bottom_margin"
+        android:background="@drawable/bg_mobile_bottom_nav_dock"
+        android:elevation="@dimen/mobile_bottom_nav_elevation"
         app:itemIconSize="24dp"
         app:itemIconTint="@color/mobile_bottom_nav_item"
         app:itemTextAppearanceActive="@style/MobileBottomNavText"
         app:itemTextAppearanceActiveBoldEnabled="false"
         app:itemTextAppearanceInactive="@style/MobileBottomNavText"
-        app:paddingBottomSystemWindowInsets="true"
+        app:paddingBottomSystemWindowInsets="false"
         app:itemTextColor="@color/mobile_bottom_nav_item"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -241,8 +241,9 @@ public class MobileBrowseActivity extends MobileActivity
 
     @Override
     protected boolean shouldInsetContentForNavigationBar() {
-        // BottomNavigationView paints through the gesture area and applies that inset internally.
-        return false;
+        // The floating dock sits inside the safe content area; inset the root once and keep the
+        // dock's own bottom margin independent of gesture / three-button navigation geometry.
+        return true;
     }
 
     @Override
@@ -524,8 +525,10 @@ public class MobileBrowseActivity extends MobileActivity
 
     @Override
     public int getMiniCardBottomOffsetPx() {
-        // The card floats above the 56dp Material bottom-nav row (see activity_mobile_browse.xml).
-        return Math.round(56 * getResources().getDisplayMetrics().density);
+        // The morph target is measured from this Activity's safe content bottom. Include the
+        // dock's bottom margin; MobilePlaybackActivity adds the card-to-dock gap separately.
+        return getResources().getDimensionPixelSize(R.dimen.mobile_bottom_nav_height)
+                + getResources().getDimensionPixelSize(R.dimen.mobile_bottom_nav_bottom_margin);
     }
 
     /**

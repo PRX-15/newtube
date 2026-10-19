@@ -50,9 +50,9 @@ public final class MiniPlayerBridge {
         Class<?> getMiniHostViewClass();
 
         /**
-         * Distance in px between the host's card bottom edge and the content bottom (Home's
-         * 56dp bottom-nav row; 0 for overlay hosts). Lets the minimize morph land exactly on
-         * THIS host's card instead of always assuming Home's geometry.
+         * Distance in px from the host's safe content bottom to the dock's top edge (Home's
+         * dock height plus bottom margin; 0 for overlay hosts). The player adds the card gap so
+         * its minimize morph lands on THIS host's geometry.
          */
         int getMiniCardBottomOffsetPx();
     }
