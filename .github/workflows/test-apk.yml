@@ -29,8 +29,39 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      # Keep one signing identity across CI builds so Android accepts each APK as an update.
+      - name: Restore persistent debug signing key
+        env:
+          KEYSTORE_PASSWORD: newtube-actions-debug
+        run: |
+          set -euo pipefail
+          mkdir -p .ci-signing
+          if ! gh run download --repo "$GITHUB_REPOSITORY" --name newtube-debug-signing-key --dir .ci-signing 2>/dev/null; then
+            keytool -genkeypair -v \
+              -keystore .ci-signing/newtube-debug.jks \
+              -storepass "$KEYSTORE_PASSWORD" \
+              -keypass "$KEYSTORE_PASSWORD" \
+              -alias newtube-debug \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=NewTube Debug,O=PRX-15,C=IN"
+          fi
+          cat > keystore.properties <<EOF
+          storeFile=.ci-signing/newtube-debug.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=newtube-debug
+          keyPassword=$KEYSTORE_PASSWORD
+          EOF
+
       - name: Build arm64-v8a debug APK
         run: ./gradlew --no-daemon --stacktrace :smarttubetv:assembleStmobileDebug -PrestrictedAbi=arm64-v8a
+
+      - name: Save persistent debug signing key
+        uses: actions/upload-artifact@v4
+        with:
+          name: newtube-debug-signing-key
+          path: .ci-signing/newtube-debug.jks
+          retention-days: 90
+          if-no-files-found: error
 
       - name: Find arm64-v8a APK
         id: apk
