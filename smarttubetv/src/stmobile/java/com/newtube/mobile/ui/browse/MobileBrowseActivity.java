@@ -1619,6 +1619,7 @@ public class MobileBrowseActivity extends MobileActivity
             return;
         }
         rebuildBottomNav();
+        mBottomNav.post(this::updateNavIndicator);
         if (mYouShowing) {
             rebuildYouRows();
         }
