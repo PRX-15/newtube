@@ -4,7 +4,8 @@
          setting, moved here from values/ (which now holds the light ones). Only the colours that
          differ between the themes are listed; see values/colors_mobile.xml for what they're for. -->
     <color name="mobile_color_cast_active">#4FC3F7</color>
-    <color name="mobile_nav_selected_indicator">#40FFFFFF</color>
+    <color name="mobile_nav_selected_indicator">#80FFFFFF</color>
+    <color name="mobile_color_search_button">#2A2A2A</color>
     <color name="mobile_color_background">#0F0F0F</color>
     <color name="mobile_color_surface">#1E1E1E</color>
     <color name="mobile_color_on_surface">#FFFFFF</color>
