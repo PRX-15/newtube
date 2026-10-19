@@ -1015,15 +1015,12 @@ public class MobileBrowseActivity extends MobileActivity
 
     /** Hide the floating dock only while the reader is moving down through a feed. */
     private void hideBottomNav() {
-        if (mBottomNav == null || mBottomNavHidden || mYouShowing) {
+        if (mBottomNav == null || mBottomNavHidden) {
             return;
         }
         mBottomNavHidden = true;
+        // Move the dock completely below the safe content edge.
         float distance = mBottomNav.getHeight()
-                + mBottomNav.getLayoutParams().height
-                + 20f * getResources().getDisplayMetrics().density;
-        // Use the measured height, not the layout-param sentinel, for a stable off-screen target.
-        distance = mBottomNav.getHeight()
                 + 50f * getResources().getDisplayMetrics().density;
         mBottomNav.animate().cancel();
         mNavIndicator.animate().cancel();
