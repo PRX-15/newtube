@@ -56,19 +56,11 @@ jobs:
               -dname "CN=NewTube Debug,O=PRX-15,C=IN"
           fi
           cat > keystore.properties <<EOF
-          storeFile=.ci-signing/newtube-debug.jks
+          storeFile=$GITHUB_WORKSPACE/.ci-signing/newtube-debug.jks
           storePassword=$KEYSTORE_PASSWORD
           keyAlias=newtube-debug
           keyPassword=$KEYSTORE_PASSWORD
           EOF
-
-      - name: Save persistent debug signing key
-        uses: actions/upload-artifact@v4
-        with:
-          name: newtube-debug-signing-key
-          path: .ci-signing/newtube-debug.jks
-          retention-days: 90
-          if-no-files-found: error
 
       - name: Build arm64-v8a debug APK
         run: ./gradlew --no-daemon --stacktrace :smarttubetv:assembleStmobileDebug -PrestrictedAbi=arm64-v8a
