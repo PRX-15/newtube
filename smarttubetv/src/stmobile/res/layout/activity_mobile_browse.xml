@@ -376,17 +376,20 @@
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
 
-    <!-- Small selected-tab marker positioned over the active menu item in code. -->
-    <View
-        android:id="@+id/mobile_bottom_nav_indicator"
-        android:layout_width="48dp"
-        android:layout_height="5dp"
-        android:background="@drawable/bg_mobile_nav_selected_indicator"
-        android:clickable="false"
-        android:focusable="false"
-        android:importantForAccessibility="no"
-        android:visibility="invisible" />
+        <!-- The indicator belongs to the dock itself, so it can never drift to screen coordinates. -->
+        <View
+            android:id="@+id/mobile_bottom_nav_indicator"
+            android:layout_width="48dp"
+            android:layout_height="5dp"
+            android:layout_gravity="bottom|start"
+            android:background="@drawable/bg_mobile_nav_selected_indicator"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no"
+            android:visibility="invisible" />
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
