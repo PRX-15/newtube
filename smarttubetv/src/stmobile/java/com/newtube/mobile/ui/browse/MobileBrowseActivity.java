@@ -854,7 +854,23 @@ public class MobileBrowseActivity extends MobileActivity
      * touch Search view. Passing {@code null} opens an empty search field (no pre-filled query).
      */
     private void setupSearchButton() {
-        mSearchButton.setOnClickListener(v -> SearchPresenter.instance(this).startSearch(null));
+        mSearchButton.setOnClickListener(v -> {
+            int[] origin = new int[2];
+            v.getLocationOnScreen(origin);
+            Intent searchIntent = new Intent(this,
+                    com.newtube.mobile.ui.search.MobileSearchActivity.class);
+            searchIntent.putExtra("mobile_search_origin_x", origin[0]);
+            searchIntent.putExtra("mobile_search_origin_y", origin[1]);
+            searchIntent.putExtra("mobile_search_origin_width", v.getWidth());
+            searchIntent.putExtra("mobile_search_origin_height", v.getHeight());
+            try {
+                startActivity(searchIntent);
+            } catch (RuntimeException ignored) {
+                // Fall back to the presenter's standard routing if this build maps SearchView
+                // through a custom activity/view manager rather than the direct mobile activity.
+                SearchPresenter.instance(this).startSearch(null);
+            }
+        });
     }
 
     // ---------------------------------------------------------------------------------
@@ -989,34 +1005,25 @@ public class MobileBrowseActivity extends MobileActivity
                 || mBottomNav.getVisibility() != View.VISIBLE) {
             return;
         }
-        int selectedId = mBottomNav.getSelectedItemId();
-        View selectedItem = mBottomNav.findViewById(selectedId);
-        if (selectedItem == null || selectedItem.getWidth() == 0 || mBottomNav.getWidth() == 0) {
+        View selectedItem = mBottomNav.findViewById(mBottomNav.getSelectedItemId());
+        if (selectedItem == null || selectedItem.getWidth() == 0
+                || mBottomNav.getWidth() == 0 || mNavIndicator.getWidth() == 0) {
             mNavIndicator.setVisibility(View.INVISIBLE);
             return;
         }
 
-        View root = findViewById(R.id.mobile_browse_root);
-        if (root == null) {
-            mNavIndicator.setVisibility(View.INVISIBLE);
-            return;
-        }
-
+        // The marker is a child of BottomNavigationView. Convert the selected item's
+        // screen position into the dock's own coordinate space (never the activity root).
         float density = getResources().getDisplayMetrics().density;
         float indicatorWidth = 48f * density;
-        int[] rootWindowLocation = new int[2];
-        int[] itemWindowLocation = new int[2];
-        int[] navWindowLocation = new int[2];
-        root.getLocationInWindow(rootWindowLocation);
-        selectedItem.getLocationInWindow(itemWindowLocation);
-        mBottomNav.getLocationInWindow(navWindowLocation);
+        int[] itemLocation = new int[2];
+        int[] navLocation = new int[2];
+        selectedItem.getLocationOnScreen(itemLocation);
+        mBottomNav.getLocationOnScreen(navLocation);
 
-        // Position the marker near the dock's lower edge, underneath the tab labels.
-        // Use window coordinates for both views, then convert into the root's coordinates.
-        float x = itemWindowLocation[0] - rootWindowLocation[0]
+        float x = itemLocation[0] - navLocation[0]
                 + (selectedItem.getWidth() - indicatorWidth) / 2f;
-        float y = navWindowLocation[1] - rootWindowLocation[1]
-                + mBottomNav.getHeight() - (9f * density)
+        float y = mBottomNav.getHeight() - (9f * density)
                 - (mNavIndicator.getHeight() / 2f);
 
         mNavIndicator.setX(x);
