@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -149,6 +150,8 @@ public class MobileSearchActivity extends MobileActivity
         setupGrid();
         setupSearchInput();
 
+        playSearchEntryAnimation(getIntent());
+
         mBackButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         mMicButton.setOnClickListener(v -> startVoiceRecognition());
         // Clear the query, keep editing: focus stays, history rows replace the suggestions.
@@ -161,6 +164,68 @@ public class MobileSearchActivity extends MobileActivity
         mPresenter = SearchPresenter.instance(this);
         mPresenter.setView(this);
         mPresenter.onViewInitialized();
+    }
+
+    /**
+     * Expands the search field from the home toolbar's search icon. The back and microphone
+     * controls emerge from the same origin, so the toolbar reads as one connected motion.
+     */
+    private void playSearchEntryAnimation(Intent intent) {
+        if (intent == null
+                || !intent.hasExtra("mobile_search_origin_x")
+                || !intent.hasExtra("mobile_search_origin_y")) {
+            return;
+        }
+
+        final int originX = intent.getIntExtra("mobile_search_origin_x", 0);
+        final int originY = intent.getIntExtra("mobile_search_origin_y", 0);
+        final int originWidth = intent.getIntExtra("mobile_search_origin_width", 48);
+        final int originHeight = intent.getIntExtra("mobile_search_origin_height", 48);
+
+        final View toolbar = findViewById(R.id.mobile_search_toolbar);
+        toolbar.post(() -> {
+            if (isFinishing() || mSearchInput.getWidth() == 0) {
+                return;
+            }
+
+            int[] fieldLocation = new int[2];
+            mSearchInput.getLocationOnScreen(fieldLocation);
+            float fieldCenterX = fieldLocation[0] + mSearchInput.getWidth() / 2f;
+            float fieldCenterY = fieldLocation[1] + mSearchInput.getHeight() / 2f;
+            float originCenterX = originX + originWidth / 2f;
+            float originCenterY = originY + originHeight / 2f;
+            float scaleX = Math.max(0.08f, Math.min(0.6f,
+                    originWidth / (float) mSearchInput.getWidth()));
+            float scaleY = Math.max(0.2f, Math.min(0.8f,
+                    originHeight / (float) mSearchInput.getHeight()));
+
+            mSearchInput.setPivotX(mSearchInput.getWidth() / 2f);
+            mSearchInput.setPivotY(mSearchInput.getHeight() / 2f);
+            mSearchInput.setTranslationX(originCenterX - fieldCenterX);
+            mSearchInput.setTranslationY(originCenterY - fieldCenterY);
+            mSearchInput.setScaleX(scaleX);
+            mSearchInput.setScaleY(scaleY);
+            mSearchInput.setAlpha(0.7f);
+
+            View[] trailingControls = {mBackButton, mMicButton};
+            for (View control : trailingControls) {
+                control.setAlpha(0f);
+                control.setScaleX(0.72f);
+                control.setScaleY(0.72f);
+                control.setTranslationY(8f * getResources().getDisplayMetrics().density);
+            }
+
+            DecelerateInterpolator easing = new DecelerateInterpolator(1.6f);
+            mSearchInput.animate()
+                    .translationX(0f).translationY(0f)
+                    .scaleX(1f).scaleY(1f).alpha(1f)
+                    .setDuration(420L).setInterpolator(easing).start();
+
+            mBackButton.animate().alpha(1f).scaleX(1f).scaleY(1f).translationY(0f)
+                    .setStartDelay(55L).setDuration(300L).setInterpolator(easing).start();
+            mMicButton.animate().alpha(1f).scaleX(1f).scaleY(1f).translationY(0f)
+                    .setStartDelay(100L).setDuration(320L).setInterpolator(easing).start();
+        });
     }
 
     private void bindViews() {
